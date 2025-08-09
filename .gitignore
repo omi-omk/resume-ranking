@@ -4,3 +4,4 @@ nginx/log
 *.mp4
 NOTE.md
 .DS_Store
+.env
