@@ -1,9 +1,7 @@
 import json
 import time
+import httpx
 
-import jsbeautifier
-from langchain.schema import HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 from src.matching.config import matching_config
 from src.matching.prompts import fn_matching_analysis, system_prompt_matching
 from src.utils import LOGGER
@@ -26,17 +24,8 @@ def analyse_matching(matching_data):
 
     content = generate_content(job=matching_data.job, candidate=matching_data.candidate)
 
-    llm = ChatOpenAI(model=matching_config.MODEL_NAME, temperature=0.5)
-    completion = llm.predict_messages(
-        [
-            SystemMessage(content=system_prompt_matching),
-            HumanMessage(content=content),
-        ],
-        functions=fn_matching_analysis,
-    )
-    output_analysis = completion.additional_kwargs
-
-    json_output = output2json(output=output_analysis)
+    # Use Ollama instead of OpenAI
+    json_output = analyse_matching_with_ollama(content)
 
     # Extract scores and store them in a list
     weights = {
@@ -63,3 +52,63 @@ def analyse_matching(matching_data):
     LOGGER.info(f"Time analyse matching: {time.time() - start}")
 
     return json_output
+
+
+async def analyse_matching_with_ollama(content):
+    """Analyze candidate-job matching using Ollama local LLM"""
+    
+    prompt = f"""
+    {system_prompt_matching}
+    
+    Please analyze the matching between candidate and job requirements:
+    
+    {content}
+    
+    Return a JSON object with detailed scoring and comments for each category:
+    {{
+        "degree": {{"score": 0-100, "comment": "explanation"}},
+        "experience": {{"score": 0-100, "comment": "explanation"}},
+        "technical_skill": {{"score": 0-100, "comment": "explanation"}},
+        "responsibility": {{"score": 0-100, "comment": "explanation"}},
+        "certificate": {{"score": 0-100, "comment": "explanation"}},
+        "soft_skill": {{"score": 0-100, "comment": "explanation"}},
+        "summary_comment": "overall assessment"
+    }}
+    """
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "llama3.1",
+                    "prompt": prompt,
+                    "stream": False,
+                    "format": "json"
+                },
+                timeout=120.0
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return json.loads(result["response"])
+            else:
+                LOGGER.error(f"Ollama API error: {response.status_code}")
+                return get_default_matching_response()
+                
+    except Exception as e:
+        LOGGER.error(f"Error calling Ollama: {str(e)}")
+        return get_default_matching_response()
+
+
+def get_default_matching_response():
+    """Return default response when Ollama fails"""
+    return {
+        "degree": {"score": 0, "comment": "Analysis failed"},
+        "experience": {"score": 0, "comment": "Analysis failed"},
+        "technical_skill": {"score": 0, "comment": "Analysis failed"},
+        "responsibility": {"score": 0, "comment": "Analysis failed"},
+        "certificate": {"score": 0, "comment": "Analysis failed"},
+        "soft_skill": {"score": 0, "comment": "Analysis failed"},
+        "summary_comment": "Analysis failed - please try again"
+    }

@@ -1,30 +1,21 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,ts,jsx,tsx}", "./src/app/**/*.{js,ts,jsx,tsx}"],
-  darkMode: "class",
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
   theme: {
-    fontFamily: {
-      primary: "Orbitron",
-      secondary: "sans-serif",
-      tertiary: "Aldrich",
-    },
-    container: {
-      padding: {
-        DEFAULT: "15px",
-      },
-    },
     extend: {
-      maxWidth: {
-        "3xl": "64rem",
+      colors: {
+        primary: {
+          50: '#eff6ff',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+        },
       },
-      fontFamily: {
-        mono: ["var(--font-roboto-mono)"],
-      },
-    },
-    backgroundImage: {
-      site: "url('/assets/site-bg.jpg')",
-      services: "url('/assets/services.png')",
     },
   },
   plugins: [],
-};
+}

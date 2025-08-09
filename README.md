@@ -1,149 +1,136 @@
 # Resume Ranking Application
 
-[![Development](https://github.com/vectornguyen76/resume-ranking/actions/workflows/development_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/development_pipeline.yml)
-[![Staging](https://github.com/vectornguyen76/resume-ranking/actions/workflows/staging_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/staging_pipeline.yml)
-[![Production](https://github.com/vectornguyen76/resume-ranking/actions/workflows/production_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/production_pipeline.yml)
 
 ## Overview
 
-The Resume Ranking Application is an AI-powered recruitment tool that leverages Large Language Models (LLM) and advanced NLP techniques to automatically evaluate, analyze, and rank resumes based on job requirements. Built with FastAPI, Next.js, and OpenAI's GPT models, it provides intelligent candidate-job matching with detailed scoring and analysis.
+The Resume Ranking Application is an AI-powered recruitment tool that leverages Large Language Models (LLM) and advanced NLP techniques to automatically evaluate, analyze, and rank resumes based on job requirements. Built with FastAPI, Next.js, and Ollama (local LLM), it provides intelligent candidate-job matching with detailed scoring and analysis.
 
-## Demo Video
-
-[![Resume Ranking Application Demo](https://img.youtube.com/vi/Gd178Pd48Q4/0.jpg)](https://youtu.be/Gd178Pd48Q4)
-
-Click the image above to watch the demo video on YouTube.
-
-## Architecture
-
-<p align="center">
-  <img src="./assets/architecture.png" alt="Architecture" />
-  <br>
-  <em>System Architecture</em>
-</p>
 
 ## Key Technologies
 
-- **Backend**: FastAPI, Flask, MongoDB
-- **Frontend**: Next.js, TypeScript, TailwindCSS
-- **AI/ML**: OpenAI GPT models, LangChain
-- **Infrastructure**: Docker, Nginx, GitHub Actions, AWS
+- **Backend**: FastAPI, MongoDB
+- **Frontend**: Next.js 14, TypeScript, TailwindCSS
+- **AI/ML**: Ollama (Local LLM), Llama 3.1
+- **Infrastructure**: Docker, Nginx
 
 ## Features
 
 ### Job Description Analysis
 
-- **Intelligent JD Parsing**:
-  - Extracts key requirements, skills, and qualifications using LLM
+- **Local LLM Analysis**:
+  - Extracts key requirements, skills, and qualifications using Ollama
   - Structures data into standardized format for matching
-  - Supports multiple languages through GPT's multilingual capabilities
-  - Average processing time: 3 seconds
+  - Privacy-focused with local processing
+  - Fast processing with local inference
 
 ### Resume Analysis
 
-- **Advanced CV Processing**:
+- **Local CV Processing**:
   - Handles PDF and Word documents
-  - Extracts and structures candidate information using LLM
+  - Extracts and structures candidate information using local LLM
   - Identifies skills, experience, and qualifications
-  - Supports multilingual resumes
-  - Average processing time: 5-10 seconds
+  - No data leaves your infrastructure
 
 ### AI-Powered Matching
 
-- **Sophisticated Matching Algorithm**:
-  - Uses LangChain for orchestrating complex LLM operations
-  - Function calling for structured data extraction
+- **Local Matching Algorithm**:
+  - Uses Ollama for local LLM operations
   - Semantic understanding of job requirements and candidate qualifications
-  - Many-to-many relationship support
-  - Average processing time: 3-5 seconds
+  - Privacy-preserving analysis
 
 ### Intelligent Ranking
 
-- **Smart Evaluation System**:
-  - Generates detailed match analysis using GPT models
+- **Local Evaluation System**:
+  - Generates detailed match analysis using local LLM
   - Provides scoring based on multiple criteria
   - Offers AI-generated feedback and comments
   - Ranks candidates based on overall fit
 
-## Technical Features
-
-- **FastAPI Integration**:
-
-  - Async request handling
-  - Automatic API documentation with Swagger UI
-  - Type validation with Pydantic models
-
-- **LangChain Implementation**:
-
-  - Custom prompt engineering
-  - Structured output parsing
-  - Chain of thought reasoning
-
-- **OpenAI Function Calling**:
-  - Structured data extraction
-  - Consistent output formatting
-  - Enhanced control over LLM responses
-
-## Documentation
-
-Detailed documentation on system architecture, API endpoints, and configuration options is available in the [User Guide](./assets/presentation.pdf).
 
 ## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- At least 8GB RAM for Ollama
+
+### Installation
 
 1. **Clone the Repository**:
 
    ```bash
    git clone https://github.com/vectornguyen76/resume-ranking.git
+   cd resume-ranking
    ```
 
-2. **Configure Environment**:
-
-   - Set up OpenAI API key:
-     ```bash
-     # analysis_service/.env
-     OPENAI_API_KEY="your-key"
-     ```
-   - Configure frontend API URL:
-     ```bash
-     # frontend/.env.production
-     NEXT_PUBLIC_API_URL=http://<your-ip-address>/backend
-     ```
-
-3. **Build and Run**:
+2. **Start the Application**:
 
    ```bash
-   cd resume-ranking
-   docker compose build
-   docker compose up
+   docker compose up -d
+   ```
+
+3. **Install Ollama Model**:
+
+   ```bash
+   # Wait for Ollama to start, then install the model
+   docker exec -it ollama ollama pull llama3.1
    ```
 
 4. **Access Application**:
-   - Frontend: `http://your-ip-address`
+   - Frontend: `http://localhost`
+   - Backend API: `http://localhost/backend`
 
-## Development
+## Usage
 
-- **Code Quality**:
+1. **Create Job Positions**: Add job descriptions with requirements
+2. **Upload Resumes**: Upload candidate CV files (PDF/DOCX)
+3. **Run Matching**: Select a job and run AI-powered matching
+4. **Review Results**: View detailed scoring and recommendations
 
-  - Ruff for Python linting
-  - ESLint for TypeScript/JavaScript
-  - Pre-commit hooks for code formatting
+## Local Development
 
-- **Testing**:
+1. **Install Dependencies**:
+   ```bash
+   # Frontend
+   cd frontend && npm install
+   
+   # Backend
+   cd backend && pip install -r requirements.txt
+   
+   # Analysis Service
+   cd analysis_service && pip install -r requirements.txt
+   ```
 
-  - Unit tests with pytest
-  - Integration tests for API endpoints
-  - Frontend testing with React Testing Library
+2. **Start Services**:
+   ```bash
+   # Start Ollama
+   docker run -d -p 11434:11434 --name ollama ollama/ollama
+   docker exec -it ollama ollama pull llama3.1
+   
+   # Start MongoDB
+   docker run -d -p 27017:27017 --name mongo mongo
+   
+   # Start services
+   cd analysis_service && uvicorn app:app --port 7000
+   cd backend && flask run --port 5000
+   cd frontend && npm run dev
+   ```
 
-- **CI/CD**:
-  - Automated testing with GitHub Actions
-  - Docker image builds
-  - Deployment automation
+## Configuration
 
-## Contributors
+### Environment Variables
 
-- [Pham Phu Ngoc Trai](https://github.com/jayllfpt)
-- [Vector Nguyen](https://github.com/vectornguyen76)
+- `NEXT_PUBLIC_API_URL`: Backend API URL (default: http://localhost:5000)
+- `MONGO_URL`: MongoDB connection string
+- `OLLAMA_HOST`: Ollama server host (default: localhost:11434)
 
-## License
+### Ollama Models
 
-This project is licensed under the [MIT License](LICENSE).
+The application uses Llama 3.1 by default. You can use other models by updating the model name in the analysis service configuration.
+
+## Privacy & Security
+
+- **Local Processing**: All AI analysis happens locally using Ollama
+- **No External API Calls**: No data is sent to external AI services
+- **Data Privacy**: Resume and job data stays within your infrastructure
+- **Secure**: No API keys or external dependencies for AI processing

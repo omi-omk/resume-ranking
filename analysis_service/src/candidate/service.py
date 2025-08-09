@@ -2,11 +2,9 @@ import json
 import os
 import time
 from datetime import datetime
+import httpx
 
-import jsbeautifier
-from langchain.schema import HumanMessage, SystemMessage
 from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader
-from langchain_openai import ChatOpenAI
 from src.candidate.config import candidate_config
 from src.candidate.prompts import fn_candidate_analysis, system_prompt_candidate
 from src.utils import LOGGER
@@ -64,19 +62,83 @@ def analyse_candidate(cv_content):
     start = time.time()
     LOGGER.info("Start analyse candidate")
 
-    llm = ChatOpenAI(model=candidate_config.MODEL_NAME, temperature=0.5)
-    completion = llm.predict_messages(
-        [
-            SystemMessage(content=system_prompt_candidate),
-            HumanMessage(content=cv_content),
-        ],
-        functions=fn_candidate_analysis,
-    )
-
-    output_analysis = completion.additional_kwargs
-    json_output = output2json(output=output_analysis)
+    # Use Ollama instead of OpenAI
+    json_output = analyse_with_ollama(cv_content)
 
     LOGGER.info("Done analyse candidate")
     LOGGER.info(f"Time analyse candidate: {time.time() - start}")
 
     return json_output
+
+
+async def analyse_with_ollama(cv_content):
+    """Analyze candidate CV using Ollama local LLM"""
+    
+    prompt = f"""
+    {system_prompt_candidate}
+    
+    Please analyze the following CV and extract the information in JSON format:
+    
+    CV Content:
+    {cv_content}
+    
+    Return a JSON object with the following structure:
+    {{
+        "candidate_name": "string",
+        "phone_number": "string", 
+        "email": "string",
+        "degree": ["array of strings"],
+        "experience": ["array of strings"],
+        "technical_skill": ["array of strings"],
+        "responsibility": ["array of strings"],
+        "certificate": ["array of strings"],
+        "soft_skill": ["array of strings"],
+        "comment": "string",
+        "job_recommended": ["array of strings"],
+        "office": 0,
+        "sql": 0
+    }}
+    """
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "llama3.1",
+                    "prompt": prompt,
+                    "stream": False,
+                    "format": "json"
+                },
+                timeout=120.0
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return json.loads(result["response"])
+            else:
+                LOGGER.error(f"Ollama API error: {response.status_code}")
+                return get_default_candidate_response()
+                
+    except Exception as e:
+        LOGGER.error(f"Error calling Ollama: {str(e)}")
+        return get_default_candidate_response()
+
+
+def get_default_candidate_response():
+    """Return default response when Ollama fails"""
+    return {
+        "candidate_name": "Unknown",
+        "phone_number": "",
+        "email": "",
+        "degree": [],
+        "experience": [],
+        "technical_skill": [],
+        "responsibility": [],
+        "certificate": [],
+        "soft_skill": [],
+        "comment": "Analysis failed - please try again",
+        "job_recommended": [],
+        "office": 0,
+        "sql": 0
+    }

@@ -1,16 +1,16 @@
-// Import required components
-import HeadMain from "../components/HeadMain"; // Import the HeadMain component
-import BreadcrumbDashboard from "./components/layouts/BreadcrumbDashboard"; // Import the BreadcrumbDashboard component
+import { StatsCards } from '@/components/dashboard/stats-cards'
+import { RecentActivity } from '@/components/dashboard/recent-activity'
 
-// Define the Dashboard component
 export default function Dashboard() {
   return (
-    <>
-      {/* Set the title and meta description of the page */}
-      <HeadMain title="Dashboard - Jobfit" description="Dashboard - Jobfit" />
-
-      {/* Display the breadcrumb */}
-      <BreadcrumbDashboard title="Dashboard" />
-    </>
-  );
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600">Welcome to your resume ranking dashboard</p>
+      </div>
+      
+      <StatsCards />
+      <RecentActivity />
+    </div>
+  )
 }

@@ -1,33 +1,29 @@
-import { Roboto_Mono } from "next/font/google";
-import React from "react";
-import "react-toastify/dist/ReactToastify.css";
-import { ContextProvider } from "./context/ContextProvider";
-import "./globals.css";
-import ReactQueryWrapper from "./react-query/ReactQueryWrapper";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Providers } from './providers'
+import { Toaster } from 'react-hot-toast'
 
-const roboto_mono = Roboto_Mono({
-  variable: "--font-roboto-mono",
-  display: "swap",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: "CODEX - Jobfit",
-  description: "CODEX - Jobfit",
-};
+export const metadata: Metadata = {
+  title: 'Resume Ranking - AI-Powered Recruitment',
+  description: 'AI-powered resume ranking and candidate matching system',
+}
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${roboto_mono.variable}`}>
-      <body>
-        <ReactQueryWrapper>
-          <ContextProvider>{children}</ContextProvider>
-        </ReactQueryWrapper>
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>
+          {children}
+          <Toaster position="top-right" />
+        </Providers>
       </body>
     </html>
-  );
+  )
 }

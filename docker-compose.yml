@@ -1,5 +1,16 @@
 version: "3"
 services:
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+
   analysis_service:
     container_name: analysis_service
     image: vectornguyen76/analysis_service
@@ -9,6 +20,8 @@ services:
     volumes:
       - ./analysis_service/logs:/app/logs
       - ./analysis_service/candidate_cv:/app/candidate_cv
+    depends_on:
+      - ollama
 
   frontend_service:
     container_name: resume_ranking_frontend
@@ -59,3 +72,4 @@ services:
 
 volumes:
   mongo_data:
+  ollama_data:

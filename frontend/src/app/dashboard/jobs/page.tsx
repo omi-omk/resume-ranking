@@ -1,44 +1,20 @@
-import React from "react";
-import HeadMain from "@/app/components/HeadMain"; // Import the HeadMain component
-import BreadcrumbDashboard from "../components/layouts/BreadcrumbDashboard"; // Import the BreadcrumbDashboard component
-import TableJobs from "../components/table/TableJobs"; // Import the TableFAQ component
+import { JobsTable } from '@/components/jobs/jobs-table'
+import { CreateJobButton } from '@/components/jobs/create-job-button'
 
-type Props = {};
-
-const FAQ = (props: Props) => {
+export default function JobsPage() {
   return (
-    <>
-      {/* Set the title and meta description of the page */}
-      <HeadMain
-        title="Jobs - Management | Dashboard - Jobfit"
-        description="Dashboard - Jobfit"
-      />
-
-      {/* Display the breadcrumb */}
-      <BreadcrumbDashboard title="Jobs" />
-
-      {/* Main content of the FAQ page */}
-      <div className="px-4 pt-6">
-        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:text-white dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-          {/* <div className="font-bold text-lg">FAQ</div> */}
-
-          {/* List of FAQs */}
-          <div id="list-faq" className="mt-4">
-            <div className="flex flex-col mt-6">
-              <div className="overflow-x-auto">
-                <div className="inline-block min-w-full align-middle">
-                  <div className="overflow-hidden shadow">
-                    {/* Render the FAQ table */}
-                    <TableJobs />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
+          <p className="text-gray-600">Manage job positions and requirements</p>
         </div>
+        <CreateJobButton />
       </div>
-    </>
-  );
-};
-
-export default FAQ;
+      
+      <div className="card p-6">
+        <JobsTable />
+      </div>
+    </div>
+  )
+}
