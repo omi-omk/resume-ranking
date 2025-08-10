@@ -2,7 +2,7 @@ import json
 import os
 import time
 from datetime import datetime
-import httpx
+import google.generativeai as genai
 
 from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader
 from src.candidate.config import candidate_config
@@ -25,12 +25,6 @@ async def save_cv_candidate(file):
         f.write(contents)
 
     return file_name
-
-
-def output2json(output):
-    """GPT Output Object >>> json"""
-    opts = jsbeautifier.default_options()
-    return json.loads(jsbeautifier.beautify(output["function_call"]["arguments"], opts))
 
 
 def load_pdf_docx(file_path):
@@ -62,8 +56,8 @@ def analyse_candidate(cv_content):
     start = time.time()
     LOGGER.info("Start analyse candidate")
 
-    # Use Ollama instead of OpenAI
-    json_output = analyse_with_ollama(cv_content)
+    # Use Gemini instead of Ollama
+    json_output = analyse_with_gemini(cv_content)
 
     LOGGER.info("Done analyse candidate")
     LOGGER.info(f"Time analyse candidate: {time.time() - start}")
@@ -71,8 +65,17 @@ def analyse_candidate(cv_content):
     return json_output
 
 
-async def analyse_with_ollama(cv_content):
-    """Analyze candidate CV using Ollama local LLM"""
+def analyse_with_gemini(cv_content):
+    """Analyze candidate CV using Google Gemini"""
+    
+    # Configure Gemini
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_api_key:
+        LOGGER.error("GEMINI_API_KEY not found in environment variables")
+        return get_default_candidate_response()
+    
+    genai.configure(api_key=gemini_api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     prompt = f"""
     {system_prompt_candidate}
@@ -98,35 +101,31 @@ async def analyse_with_ollama(cv_content):
         "office": 0,
         "sql": 0
     }}
+    
+    Respond only with valid JSON, no additional text.
     """
     
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "http://localhost:11434/api/generate",
-                json={
-                    "model": "llama3.1",
-                    "prompt": prompt,
-                    "stream": False,
-                    "format": "json"
-                },
-                timeout=120.0
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                return json.loads(result["response"])
-            else:
-                LOGGER.error(f"Ollama API error: {response.status_code}")
-                return get_default_candidate_response()
-                
+        response = model.generate_content(prompt)
+        
+        # Extract JSON from response
+        response_text = response.text.strip()
+        
+        # Remove markdown code blocks if present
+        if response_text.startswith('```json'):
+            response_text = response_text[7:]
+        if response_text.endswith('```'):
+            response_text = response_text[:-3]
+        
+        return json.loads(response_text.strip())
+        
     except Exception as e:
-        LOGGER.error(f"Error calling Ollama: {str(e)}")
+        LOGGER.error(f"Error calling Gemini: {str(e)}")
         return get_default_candidate_response()
 
 
 def get_default_candidate_response():
-    """Return default response when Ollama fails"""
+    """Return default response when Gemini fails"""
     return {
         "candidate_name": "Unknown",
         "phone_number": "",

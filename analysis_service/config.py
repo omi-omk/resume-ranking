@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     # App config
     APP_NAME: str = "API Analysis Service"
     APP_ENV: str = "develop"
+    
+    # Gemini API configuration
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 
     # Logging setting
     DATE_FMT: str = "%Y-%m-%d %H:%M:%S"

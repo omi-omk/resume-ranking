@@ -1,136 +1,222 @@
 # Resume Ranking Application
 
-
 ## Overview
 
-The Resume Ranking Application is an AI-powered recruitment tool that leverages Large Language Models (LLM) and advanced NLP techniques to automatically evaluate, analyze, and rank resumes based on job requirements. Built with FastAPI, Next.js, and Ollama (local LLM), it provides intelligent candidate-job matching with detailed scoring and analysis.
-
+The Resume Ranking Application is an AI-powered recruitment tool that leverages Google Gemini and advanced NLP techniques to automatically evaluate, analyze, and rank resumes based on job requirements. Built with FastAPI, Next.js, and Google Gemini, it provides intelligent candidate-job matching with detailed scoring and analysis.
 
 ## Key Technologies
 
-- **Backend**: FastAPI, MongoDB
+- **Backend**: Flask, MongoDB
 - **Frontend**: Next.js 14, TypeScript, TailwindCSS
-- **AI/ML**: Ollama (Local LLM), Llama 3.1
-- **Infrastructure**: Docker, Nginx
+- **AI/ML**: Google Gemini API
+- **Database**: MongoDB (local installation)
 
 ## Features
 
 ### Job Description Analysis
 
-- **Local LLM Analysis**:
-  - Extracts key requirements, skills, and qualifications using Ollama
+- **Gemini AI Analysis**:
+  - Extracts key requirements, skills, and qualifications using Google Gemini
   - Structures data into standardized format for matching
-  - Privacy-focused with local processing
-  - Fast processing with local inference
+  - Fast processing with cloud-based AI
 
 ### Resume Analysis
 
-- **Local CV Processing**:
+- **AI-Powered CV Processing**:
   - Handles PDF and Word documents
-  - Extracts and structures candidate information using local LLM
+  - Extracts and structures candidate information using Gemini
   - Identifies skills, experience, and qualifications
-  - No data leaves your infrastructure
 
 ### AI-Powered Matching
 
-- **Local Matching Algorithm**:
-  - Uses Ollama for local LLM operations
-  - Semantic understanding of job requirements and candidate qualifications
-  - Privacy-preserving analysis
+- **Intelligent Matching Algorithm**:
+  - Uses Google Gemini for semantic understanding
+  - Analyzes job requirements and candidate qualifications
+  - Provides detailed scoring and recommendations
 
 ### Intelligent Ranking
 
-- **Local Evaluation System**:
-  - Generates detailed match analysis using local LLM
+- **Advanced Evaluation System**:
+  - Generates detailed match analysis using Gemini
   - Provides scoring based on multiple criteria
   - Offers AI-generated feedback and comments
   - Ranks candidates based on overall fit
 
+## Prerequisites
 
-## Getting Started
+- Python 3.10+
+- Node.js 18+
+- MongoDB (local installation)
+- Google Gemini API key
 
-### Prerequisites
+## Installation
 
-- Docker and Docker Compose
-- At least 8GB RAM for Ollama
+### 1. Clone the Repository
 
-### Installation
+```bash
+git clone https://github.com/vectornguyen76/resume-ranking.git
+cd resume-ranking
+```
 
-1. **Clone the Repository**:
+### 2. Install Dependencies
 
-   ```bash
-   git clone https://github.com/vectornguyen76/resume-ranking.git
-   cd resume-ranking
-   ```
+```bash
+npm run install:all
+```
 
-2. **Start the Application**:
+### 3. Set Up MongoDB
 
-   ```bash
-   docker compose up -d
-   ```
+Install MongoDB locally:
 
-3. **Install Ollama Model**:
+**Ubuntu/Debian:**
+```bash
+sudo apt-get install mongodb
+sudo systemctl start mongodb
+sudo systemctl enable mongodb
+```
 
-   ```bash
-   # Wait for Ollama to start, then install the model
-   docker exec -it ollama ollama pull llama3.1
-   ```
+**macOS:**
+```bash
+brew install mongodb-community
+brew services start mongodb-community
+```
 
-4. **Access Application**:
-   - Frontend: `http://localhost`
-   - Backend API: `http://localhost/backend`
+**Windows:**
+Download and install from [MongoDB official website](https://www.mongodb.com/try/download/community)
+
+### 4. Configure Environment Variables
+
+**Analysis Service:**
+```bash
+cd analysis_service
+cp .env.example .env
+# Edit .env and add your GEMINI_API_KEY
+```
+
+**Backend:**
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your MongoDB connection string
+```
+
+### 5. Get Google Gemini API Key
+
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key
+3. Add it to your `analysis_service/.env` file
 
 ## Usage
+
+### Development Mode
+
+Start all services in development mode:
+
+```bash
+npm run dev
+```
+
+This will start:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+- Analysis Service: http://localhost:7000
+
+### Production Mode
+
+Build and start in production mode:
+
+```bash
+npm run build
+npm start
+```
+
+## Application Workflow
 
 1. **Create Job Positions**: Add job descriptions with requirements
 2. **Upload Resumes**: Upload candidate CV files (PDF/DOCX)
 3. **Run Matching**: Select a job and run AI-powered matching
 4. **Review Results**: View detailed scoring and recommendations
 
-## Local Development
+## Local Development Setup
 
-1. **Install Dependencies**:
-   ```bash
-   # Frontend
-   cd frontend && npm install
-   
-   # Backend
-   cd backend && pip install -r requirements.txt
-   
-   # Analysis Service
-   cd analysis_service && pip install -r requirements.txt
-   ```
+### Individual Service Setup
 
-2. **Start Services**:
-   ```bash
-   # Start Ollama
-   docker run -d -p 11434:11434 --name ollama ollama/ollama
-   docker exec -it ollama ollama pull llama3.1
-   
-   # Start MongoDB
-   docker run -d -p 27017:27017 --name mongo mongo
-   
-   # Start services
-   cd analysis_service && uvicorn app:app --port 7000
-   cd backend && flask run --port 5000
-   cd frontend && npm run dev
-   ```
+**Analysis Service:**
+```bash
+cd analysis_service
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app:app --port 7000 --reload
+```
+
+**Backend:**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+flask run --port 5000
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ## Configuration
 
 ### Environment Variables
 
+**Analysis Service (.env):**
+- `GEMINI_API_KEY`: Your Google Gemini API key
+
+**Backend (.env):**
+- `MONGO_URL`: MongoDB connection string (default: mongodb://localhost:27017/resume_ranking_db)
+- `ANALYSIS_SERVICE_URL`: Analysis service URL (default: http://localhost:7000)
+- `SECRET_KEY`: Flask secret key
+
+**Frontend (.env.local):**
 - `NEXT_PUBLIC_API_URL`: Backend API URL (default: http://localhost:5000)
-- `MONGO_URL`: MongoDB connection string
-- `OLLAMA_HOST`: Ollama server host (default: localhost:11434)
 
-### Ollama Models
+## API Documentation
 
-The application uses Llama 3.1 by default. You can use other models by updating the model name in the analysis service configuration.
+Access the Swagger documentation at:
+```
+http://localhost:5000/swagger-ui
+```
 
-## Privacy & Security
+## Troubleshooting
 
-- **Local Processing**: All AI analysis happens locally using Ollama
-- **No External API Calls**: No data is sent to external AI services
-- **Data Privacy**: Resume and job data stays within your infrastructure
-- **Secure**: No API keys or external dependencies for AI processing
+### Common Issues
+
+1. **MongoDB Connection Error**:
+   - Ensure MongoDB is running: `sudo systemctl status mongodb`
+   - Check connection string in backend/.env
+
+2. **Gemini API Error**:
+   - Verify your API key is correct
+   - Check API quota and billing in Google Cloud Console
+
+3. **Port Conflicts**:
+   - Make sure ports 3000, 5000, and 7000 are available
+   - Modify ports in package.json scripts if needed
+
+### Logs
+
+- Backend logs: `backend/logs/api.log`
+- Analysis service logs: `analysis_service/logs/api.log`
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.

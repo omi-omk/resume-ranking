@@ -1,24 +1,19 @@
 import json
 import time
-import httpx
+import os
+import google.generativeai as genai
 
 from src.job.config import job_config
 from src.job.prompts import fn_job_analysis, system_prompt_job
 from src.utils import LOGGER
 
 
-def output2json(output):
-    """GPT Output Object >>> json"""
-    opts = jsbeautifier.default_options()
-    return json.loads(jsbeautifier.beautify(output["function_call"]["arguments"], opts))
-
-
 def analyse_job(job_data):
     start = time.time()
     LOGGER.info("Start analyse job")
 
-    # Use Ollama instead of OpenAI
-    json_output = analyse_job_with_ollama(job_data.job_description)
+    # Use Gemini instead of Ollama
+    json_output = analyse_job_with_gemini(job_data.job_description)
 
     LOGGER.info("Done analyse job")
     LOGGER.info(f"Time analyse job: {time.time() - start}")
@@ -26,8 +21,17 @@ def analyse_job(job_data):
     return json_output
 
 
-async def analyse_job_with_ollama(job_description):
-    """Analyze job description using Ollama local LLM"""
+def analyse_job_with_gemini(job_description):
+    """Analyze job description using Google Gemini"""
+    
+    # Configure Gemini
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_api_key:
+        LOGGER.error("GEMINI_API_KEY not found in environment variables")
+        return get_default_job_response()
+    
+    genai.configure(api_key=gemini_api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     prompt = f"""
     {system_prompt_job}
@@ -46,35 +50,31 @@ async def analyse_job_with_ollama(job_description):
         "certificate": ["array of required certificates"],
         "soft_skill": ["array of soft skills"]
     }}
+    
+    Respond only with valid JSON, no additional text.
     """
     
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "http://localhost:11434/api/generate",
-                json={
-                    "model": "llama3.1",
-                    "prompt": prompt,
-                    "stream": False,
-                    "format": "json"
-                },
-                timeout=120.0
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                return json.loads(result["response"])
-            else:
-                LOGGER.error(f"Ollama API error: {response.status_code}")
-                return get_default_job_response()
-                
+        response = model.generate_content(prompt)
+        
+        # Extract JSON from response
+        response_text = response.text.strip()
+        
+        # Remove markdown code blocks if present
+        if response_text.startswith('```json'):
+            response_text = response_text[7:]
+        if response_text.endswith('```'):
+            response_text = response_text[:-3]
+        
+        return json.loads(response_text.strip())
+        
     except Exception as e:
-        LOGGER.error(f"Error calling Ollama: {str(e)}")
+        LOGGER.error(f"Error calling Gemini: {str(e)}")
         return get_default_job_response()
 
 
 def get_default_job_response():
-    """Return default response when Ollama fails"""
+    """Return default response when Gemini fails"""
     return {
         "degree": [],
         "experience": [],

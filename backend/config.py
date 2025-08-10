@@ -26,8 +26,6 @@ class DefaultConfig:
     OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
     # Database configuration
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SHOW_SQLALCHEMY_LOG_MESSAGES = False
 
     # App Environments
     APP_ENV_LOCAL = "local"
@@ -48,9 +46,6 @@ class DevelopConfig(DefaultConfig):
     # Activate debug mode
     DEBUG = True
 
-    # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
-
     MONGO_URI = os.environ.get("MONGO_URL")
 
 
@@ -64,14 +59,8 @@ class TestingConfig(DefaultConfig):
     # Activate debug mode
     DEBUG = True
 
-    # False to disable CSRF protection during tests
-    WTF_CSRF_ENABLED = False
-
     # Logging
     LOG_FILE_API = f"{basedir}/logs/api_tests.log"
-
-    # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_TEST_URL")
 
     MONGO_URI = os.environ.get("MONGO_TEST_URL")
 
@@ -83,9 +72,6 @@ class LocalConfig(DefaultConfig):
     # Activate debug mode
     DEBUG = False
 
-    # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
-
     MONGO_URI = os.environ.get("MONGO_URL")
 
 
@@ -95,8 +81,5 @@ class ProductionConfig(DefaultConfig):
 
     # Activate debug mode
     DEBUG = False
-
-    # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
     MONGO_URI = os.environ.get("MONGO_URL")

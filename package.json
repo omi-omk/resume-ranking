@@ -1,0 +1,20 @@
+{
+  "name": "resume-ranking-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:analysis\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && python -m flask run --port 5000",
+    "dev:analysis": "cd analysis_service && uvicorn app:app --port 7000 --reload",
+    "build": "cd frontend && npm run build",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\" \"npm run start:analysis\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && python -m flask run --port 5000",
+    "start:analysis": "cd analysis_service && uvicorn app:app --port 7000",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && pip install -r requirements.txt && cd ../analysis_service && pip install -r requirements.txt"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
