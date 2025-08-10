@@ -1,222 +1,237 @@
-# Resume Ranking Application
+# Resume Ranking System
 
-## Overview
-
-The Resume Ranking Application is an AI-powered recruitment tool that leverages Google Gemini and advanced NLP techniques to automatically evaluate, analyze, and rank resumes based on job requirements. Built with FastAPI, Next.js, and Google Gemini, it provides intelligent candidate-job matching with detailed scoring and analysis.
-
-## Key Technologies
-
-- **Backend**: Flask, MongoDB
-- **Frontend**: Next.js 14, TypeScript, TailwindCSS
-- **AI/ML**: Google Gemini API
-- **Database**: MongoDB (local installation)
+A unified AI-powered recruitment platform that analyzes resumes and matches candidates with job opportunities using Google Gemini AI.
 
 ## Features
 
-### Job Description Analysis
+- **Resume Analysis**: Upload PDF/DOCX files and extract candidate information using AI
+- **Job Management**: Create and manage job descriptions with automatic requirement extraction
+- **AI Matching**: Intelligent candidate-job matching with detailed scoring
+- **Modern Web Interface**: Clean, responsive web interface built with vanilla JavaScript
+- **Unified Architecture**: Single FastAPI service with integrated frontend
 
-- **Gemini AI Analysis**:
-  - Extracts key requirements, skills, and qualifications using Google Gemini
-  - Structures data into standardized format for matching
-  - Fast processing with cloud-based AI
+## Technology Stack
 
-### Resume Analysis
+- **Backend**: FastAPI (Python 3.10+)
+- **Database**: MongoDB
+- **AI**: Google Gemini API
+- **Frontend**: Vanilla JavaScript, HTML5, CSS3
+- **Document Processing**: PyPDF, python-docx
 
-- **AI-Powered CV Processing**:
-  - Handles PDF and Word documents
-  - Extracts and structures candidate information using Gemini
-  - Identifies skills, experience, and qualifications
+## Quick Start
 
-### AI-Powered Matching
+### Prerequisites
 
-- **Intelligent Matching Algorithm**:
-  - Uses Google Gemini for semantic understanding
-  - Analyzes job requirements and candidate qualifications
-  - Provides detailed scoring and recommendations
-
-### Intelligent Ranking
-
-- **Advanced Evaluation System**:
-  - Generates detailed match analysis using Gemini
-  - Provides scoring based on multiple criteria
-  - Offers AI-generated feedback and comments
-  - Ranks candidates based on overall fit
-
-## Prerequisites
-
-- Python 3.10+
-- Node.js 18+
+- Python 3.10 or higher
 - MongoDB (local installation)
 - Google Gemini API key
 
-## Installation
+### Installation
 
-### 1. Clone the Repository
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd resume-ranking
+   ```
 
-```bash
-git clone https://github.com/vectornguyen76/resume-ranking.git
-cd resume-ranking
-```
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 2. Install Dependencies
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your GEMINI_API_KEY
+   ```
 
-```bash
-npm run install:all
-```
+4. **Start MongoDB**
+   ```bash
+   # Ubuntu/Debian
+   sudo systemctl start mongodb
+   
+   # macOS
+   brew services start mongodb-community
+   
+   # Windows
+   net start MongoDB
+   ```
 
-### 3. Set Up MongoDB
+5. **Run the application**
+   ```bash
+   python -m uvicorn app.main:app --reload
+   ```
 
-Install MongoDB locally:
-
-**Ubuntu/Debian:**
-```bash
-sudo apt-get install mongodb
-sudo systemctl start mongodb
-sudo systemctl enable mongodb
-```
-
-**macOS:**
-```bash
-brew install mongodb-community
-brew services start mongodb-community
-```
-
-**Windows:**
-Download and install from [MongoDB official website](https://www.mongodb.com/try/download/community)
-
-### 4. Configure Environment Variables
-
-**Analysis Service:**
-```bash
-cd analysis_service
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
-```
-
-**Backend:**
-```bash
-cd backend
-cp .env.example .env
-# Edit .env with your MongoDB connection string
-```
-
-### 5. Get Google Gemini API Key
-
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Create a new API key
-3. Add it to your `analysis_service/.env` file
-
-## Usage
-
-### Development Mode
-
-Start all services in development mode:
-
-```bash
-npm run dev
-```
-
-This will start:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-- Analysis Service: http://localhost:7000
-
-### Production Mode
-
-Build and start in production mode:
-
-```bash
-npm run build
-npm start
-```
-
-## Application Workflow
-
-1. **Create Job Positions**: Add job descriptions with requirements
-2. **Upload Resumes**: Upload candidate CV files (PDF/DOCX)
-3. **Run Matching**: Select a job and run AI-powered matching
-4. **Review Results**: View detailed scoring and recommendations
-
-## Local Development Setup
-
-### Individual Service Setup
-
-**Analysis Service:**
-```bash
-cd analysis_service
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app:app --port 7000 --reload
-```
-
-**Backend:**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-flask run --port 5000
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm install
-npm run dev
-```
+6. **Access the application**
+   - Open your browser and go to: http://localhost:8000
+   - API documentation: http://localhost:8000/docs
 
 ## Configuration
 
 ### Environment Variables
 
-**Analysis Service (.env):**
-- `GEMINI_API_KEY`: Your Google Gemini API key
+Create a `.env` file with the following variables:
 
-**Backend (.env):**
-- `MONGO_URL`: MongoDB connection string (default: mongodb://localhost:27017/resume_ranking_db)
-- `ANALYSIS_SERVICE_URL`: Analysis service URL (default: http://localhost:7000)
-- `SECRET_KEY`: Flask secret key
+```env
+# Google Gemini API Key (required)
+GEMINI_API_KEY="your-gemini-api-key-here"
 
-**Frontend (.env.local):**
-- `NEXT_PUBLIC_API_URL`: Backend API URL (default: http://localhost:5000)
+# MongoDB Configuration
+MONGODB_URL="mongodb://localhost:27017/resume_ranking"
 
-## API Documentation
-
-Access the Swagger documentation at:
+# App Configuration
+APP_NAME="Resume Ranking System"
+APP_ENV="development"
+DEBUG=true
 ```
-http://localhost:5000/swagger-ui
+
+### Getting Google Gemini API Key
+
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key
+3. Add it to your `.env` file
+
+## Usage
+
+### 1. Upload Candidates
+- Navigate to the "Candidates" section
+- Click "Upload CVs" 
+- Select or drag & drop PDF/DOCX resume files
+- The system will automatically analyze and extract candidate information
+
+### 2. Create Jobs
+- Go to the "Jobs" section
+- Click "Create Job"
+- Enter job title and description
+- The AI will automatically extract requirements and qualifications
+
+### 3. Run Matching
+- Visit the "Matching" section
+- Select a job from the dropdown
+- Click "Start Matching"
+- View detailed matching results with scores and analysis
+
+## API Endpoints
+
+### Candidates
+- `POST /api/candidates/upload` - Upload resume files
+- `GET /api/candidates/` - List candidates (paginated)
+- `GET /api/candidates/{id}` - Get candidate details
+- `PUT /api/candidates/{id}` - Update candidate
+- `DELETE /api/candidates/{id}` - Delete candidate
+
+### Jobs
+- `POST /api/jobs/` - Create job
+- `GET /api/jobs/` - List jobs (paginated)
+- `GET /api/jobs/all` - Get all jobs (for dropdowns)
+- `GET /api/jobs/{id}` - Get job details
+- `PUT /api/jobs/{id}` - Update job
+- `DELETE /api/jobs/{id}` - Delete job
+
+### Matching
+- `POST /api/matching/process` - Process matching for a job
+- `GET /api/matching/results` - Get matching results
+- `GET /api/matching/detail/{candidate_id}/{job_id}` - Get detailed match analysis
+
+## Development
+
+### Project Structure
+```
+app/
+├── main.py              # FastAPI application entry point
+├── core/
+│   ├── config.py        # Configuration settings
+│   └── database.py      # Database connection and setup
+├── models/              # Pydantic models
+├── services/            # Business logic services
+├── api/                 # API routes and endpoints
+├── static/              # Static files (CSS, JS)
+└── templates/           # HTML templates
+```
+
+### Running in Development Mode
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Running Tests
+```bash
+pytest
+```
+
+### Code Formatting
+```bash
+ruff format app/
+ruff check app/
+```
+
+## Deployment
+
+### Production Setup
+
+1. **Set environment variables**
+   ```bash
+   export GEMINI_API_KEY="your-production-api-key"
+   export MONGODB_URL="your-production-mongodb-url"
+   export APP_ENV="production"
+   export DEBUG=false
+   ```
+
+2. **Run with production server**
+   ```bash
+   uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+   ```
+
+### Docker Deployment (Optional)
+
+```dockerfile
+FROM python:3.10-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **MongoDB Connection Error**:
+1. **MongoDB Connection Error**
    - Ensure MongoDB is running: `sudo systemctl status mongodb`
-   - Check connection string in backend/.env
+   - Check connection string in `.env` file
 
-2. **Gemini API Error**:
-   - Verify your API key is correct
-   - Check API quota and billing in Google Cloud Console
+2. **Gemini API Error**
+   - Verify API key is correct and has proper permissions
+   - Check API quota in Google Cloud Console
 
-3. **Port Conflicts**:
-   - Make sure ports 3000, 5000, and 7000 are available
-   - Modify ports in package.json scripts if needed
+3. **File Upload Issues**
+   - Ensure `uploads/` directory exists and is writable
+   - Check file size limits (default: 10MB)
 
-### Logs
-
-- Backend logs: `backend/logs/api.log`
-- Analysis service logs: `analysis_service/logs/api.log`
+4. **Port Already in Use**
+   - Change port in startup command: `--port 8001`
+   - Kill existing process: `lsof -ti:8000 | xargs kill`
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes and add tests
+4. Run tests and linting: `pytest && ruff check app/`
 5. Submit a pull request
 
 ## License
 
 This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
+
+## Support
+
+For support and questions:
+- Create an issue on GitHub
+- Check the API documentation at `/docs`
+- Review the troubleshooting section above
